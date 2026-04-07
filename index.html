@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RFID Attendance Logger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="top-bar">
+      <div class="top-bar__content">
+        <p class="project-title">PROJECT : RFID ATTENDANCE LOGGER</p>
+        <button class="theme-toggle" type="button" aria-label="Toggle theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 4.5a.9.9 0 0 1 .9.9v1.35a.9.9 0 1 1-1.8 0V5.4a.9.9 0 0 1 .9-.9Zm0 12.75a.9.9 0 0 1 .9.9v1.35a.9.9 0 0 1-1.8 0v-1.35a.9.9 0 0 1 .9-.9Zm7.5-4.35a.9.9 0 0 1 0 1.8h-1.35a.9.9 0 1 1 0-1.8h1.35Zm-12.75 0a.9.9 0 0 1 0 1.8H5.4a.9.9 0 0 1 0-1.8h1.35Zm9.056-5.07a.9.9 0 0 1 1.272 0l.956.956a.9.9 0 0 1-1.272 1.272l-.956-.956a.9.9 0 0 1 0-1.272Zm-9.828 9.828a.9.9 0 0 1 1.272 0l.956.956a.9.9 0 1 1-1.272 1.272l-.956-.956a.9.9 0 0 1 0-1.272Zm11.1 2.228a.9.9 0 0 1 0-1.272l.956-.956a.9.9 0 1 1 1.272 1.272l-.956.956a.9.9 0 0 1-1.272 0Zm-9.828-9.828a.9.9 0 0 1 0-1.272l.956-.956a.9.9 0 1 1 1.272 1.272l-.956.956a.9.9 0 0 1-1.272 0ZM12 8.1a3.9 3.9 0 1 1 0 7.8 3.9 3.9 0 0 1 0-7.8Z"
+            />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="panel" aria-labelledby="attendance-heading">
+        <h1 id="attendance-heading">Live Attendance (Active Students)</h1>
+
+        <div class="controls-row">
+          <label class="search" for="student-search">
+            <svg class="search__icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M10.5 3.5a7 7 0 0 1 5.56 11.25l4.1 4.1a1 1 0 0 1-1.42 1.42l-4.1-4.1A7 7 0 1 1 10.5 3.5Zm0 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z"
+              />
+            </svg>
+            <input
+              id="student-search"
+              type="search"
+              placeholder="Search for Student"
+              autocomplete="off"
+            />
+          </label>
+
+          <button id="refresh-btn" class="refresh-btn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 4a8 8 0 0 1 7.44 5.07.95.95 0 0 1-1.76.72A6.1 6.1 0 0 0 12 5.9a6.1 6.1 0 0 0-5.83 4.36.95.95 0 0 1-1.82-.55A8 8 0 0 1 12 4Zm7.63 5.86a.95.95 0 0 1 .95.95v3.57a.95.95 0 0 1-.95.95h-3.57a.95.95 0 1 1 0-1.9h1.36A6.1 6.1 0 0 0 12 18.1a6.1 6.1 0 0 0-5.66-3.93.95.95 0 0 1-.08-1.9 8 8 0 0 1 7.79 5.83 8 8 0 0 1 5.58-8.24Z"
+              />
+            </svg>
+            <span>Refresh</span>
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">NAME</th>
+                <th scope="col">ENTRY TIME</th>
+                <th scope="col">STATUES</th>
+              </tr>
+            </thead>
+            <tbody id="attendance-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
