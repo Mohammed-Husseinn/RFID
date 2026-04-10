@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #070a4d;
+  --color-ink-soft: #2f356c;
+  --color-paper: #e4e6ec;
+  --color-panel-bg: rgba(244, 246, 253, 0.34);
+  --color-border: #242c68;
+  --color-header-bg: #020a57;
+  --color-header-text: #f5f7ff;
+  --color-search-bg: rgba(251, 252, 255, 0.74);
+  --color-panel-border: rgba(7, 10, 77, 0.12);
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@layer base {
+  :root {
+    --bg-layer-1: radial-gradient(circle at 8% 85%, rgba(72, 103, 213, 0.18), transparent 40%);
+    --bg-layer-2: radial-gradient(circle at 90% 18%, rgba(68, 75, 148, 0.16), transparent 44%);
+    --bg-layer-3: linear-gradient(170deg, #eceef5 0%, #e4e6ec 100%);
+    --header-shadow: 0 5px 16px rgba(2, 10, 87, 0.34);
+    --panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
+  }
+
+  .dark {
+    --color-ink: #d8ddee;
+    --color-ink-soft: #aab3cc;
+    --color-paper: #070b18;
+    --color-panel-bg: rgba(4, 8, 19, 0.58);
+    --color-border: #909bb9;
+    --color-header-bg: #e4e6ec;
+    --color-header-text: #0b1023;
+    --color-search-bg: rgba(8, 12, 24, 0.64);
+    --color-panel-border: rgba(198, 211, 255, 0.24);
+    
+    --bg-layer-1: radial-gradient(circle at 12% 84%, rgba(34, 49, 98, 0.26), transparent 42%);
+    --bg-layer-2: radial-gradient(circle at 90% 8%, rgba(44, 57, 113, 0.3), transparent 46%);
+    --bg-layer-3: linear-gradient(175deg, #050812 0%, #070b18 100%);
+    --header-shadow: 0 5px 16px rgba(0, 0, 0, 0.3);
+    --panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  body {
+    @apply font-sans h-[100dvh] overflow-hidden text-ink m-0;
+    transition: background-color 220ms ease, color 220ms ease;
+    background: var(--bg-layer-1), var(--bg-layer-2), var(--bg-layer-3);
+  }
+
+  /* We override the default fonts in tailwind configuration, we can use arbitrary font-families but let's just use what's provided or normal config */
+}
+
+@layer utilities {
+  .clip-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
