@@ -1,15 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-
-const initialData = [
-  { id: 1, name: "Abdelmohmen Faried", entryTime: "09:30:25 AM", status: "Online" },
-  { id: 2, name: "Ahmed Mostafa", entryTime: "09:30:25 AM", status: "Online" },
-  { id: 3, name: "Kareem Tarek", entryTime: "09:30:25 AM", status: "Online" },
-  { id: 4, name: "Omar Yasser", entryTime: "09:30:25 AM", status: "Online" },
-  { id: 5, name: "Youssef Ibrahim", entryTime: "09:30:25 AM", status: "Online" },
-  { id: 6, name: "Zeyad Khaled", entryTime: "09:30:25 AM", status: "Online" },
-  { id: 7, name: "Ali Mahmoud", entryTime: "09:30:25 AM", status: "Online" },
-  { id: 8, name: "Hassan Adel", entryTime: "09:30:25 AM", status: "Online" },
-];
+import { supabase } from './supabase';
 
 const THEME_STORAGE_KEY = "rfid-attendance-theme";
 
@@ -26,7 +16,69 @@ function App() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [attendanceData, setAttendanceData] = useState(initialData);
+  const [attendanceData, setAttendanceData] = useState([]);
+
+  const fetchAttendance = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      const { data, error } = await supabase
+        .from('attendnce')
+        .select(`
+          id,
+          created_at,
+          nfc ( user_id )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error("Error fetching attendance:", error);
+        return;
+      }
+
+      const formattedData = data.map(record => {
+        const entryDate = new Date(record.created_at);
+        const formatNow = new Intl.DateTimeFormat("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true,
+        }).format(entryDate);
+
+        const userId = record.nfc?.user_id || "Unknown RFID";
+        const shortName = userId !== "Unknown RFID" ? `User (${userId.substring(0, 8)})` : userId;
+
+        return {
+          id: record.id,
+          name: shortName,
+          entryTime: formatNow,
+          status: "Present"
+        };
+      });
+
+      setAttendanceData(formattedData);
+    } catch (err) {
+      console.error("Unexpected error:", err);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAttendance();
+  }, [fetchAttendance]);
+
+  useEffect(() => {
+    const subscription = supabase
+      .channel('public:attendnce')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'attendnce' }, () => {
+        fetchAttendance();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [fetchAttendance]);
 
   useEffect(() => {
     const htmlEl = document.documentElement;
@@ -55,28 +107,9 @@ function App() {
     );
   }, [attendanceData, searchQuery]);
 
-  const formatNow = () => {
-    return new Intl.DateTimeFormat("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-    }).format(new Date());
-  };
-
   const handleRefresh = useCallback(() => {
-    setIsRefreshing(true);
-    const now = formatNow();
-    
-    setAttendanceData(prev => prev.map(student => ({
-      ...student,
-      entryTime: now
-    })));
-
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 900);
-  }, []);
+    fetchAttendance();
+  }, [fetchAttendance]);
 
   return (
     <div className="font-['Barlow',sans-serif] text-ink min-h-[100dvh] overflow-hidden flex flex-col transition-colors duration-200">
@@ -137,7 +170,7 @@ function App() {
                 aria-hidden="true" 
                 className={`w-[22px] fill-ink transition-colors duration-200 ${isRefreshing ? 'animate-[spin_900ms_linear]' : ''}`}
               >
-                <path d="M12 4a8 8 0 0 1 7.44 5.07.95.95 0 0 1-1.76.72A6.1 6.1 0 0 0 12 5.9a6.1 6.1 0 0 0-5.83 4.36.95.95 0 0 1-1.82-.55A8 8 0 0 1 12 4Zm7.63 5.86a.95.95 0 0 1 .95.95v3.57a.95.95 0 0 1-.95.95h-3.57a.95.95 0 1 1 0-1.9h1.36A6.1 6.1 0 0 0 12 18.1a6.1 6.1 0 0 0-5.66-3.93.95.95 0 0 1-.08-1.9 8 8 0 0 1 7.79 5.83 8 8 0 0 1 5.58-8.24Z" />
+                <path fillRule="evenodd" clipRule="evenodd" d="M4.755 10.059a7.5 7.5 0 0112.548-3.364l1.903 1.903h-3.183a.75.75 0 100 1.5h4.992a.75.75 0 00.75-.75V4.356a.75.75 0 00-1.5 0v3.18l-1.9-1.9A9 9 0 003.306 9.67a.75.75 0 101.45.388zm15.408 3.352a.75.75 0 00-.919.53 7.5 7.5 0 01-12.548 3.364l-1.902-1.903h3.183a.75.75 0 000-1.5H2.984a.75.75 0 00-.75.75v4.992a.75.75 0 001.5 0v-3.18l1.9 1.9a9 9 0 0014.509-4.135.75.75 0 00-.53-.919z" />
               </svg>
               <span>Refresh</span>
             </button>
