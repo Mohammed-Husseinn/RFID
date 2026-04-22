@@ -27,7 +27,7 @@ function App() {
         .select(`
           id,
           created_at,
-          nfc ( user_id )
+          nfc ( * )
         `)
         .order('created_at', { ascending: false });
 
@@ -38,20 +38,20 @@ function App() {
 
       const formattedData = data.map(record => {
         const entryDate = new Date(record.created_at);
-        const formatNow = new Intl.DateTimeFormat("en-US", {
+        const formatTime = new Intl.DateTimeFormat("en-US", {
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit",
           hour12: true,
         }).format(entryDate);
 
-        const userId = record.nfc?.user_id || "Unknown RFID";
-        const shortName = userId !== "Unknown RFID" ? `User (${userId.substring(0, 8)})` : userId;
+        // Try to find a name property in the joined nfc data
+        const studentName = record.nfc?.student_name || record.nfc?.full_name || record.nfc?.name || `User (${record.nfc?.user_id?.substring(0, 8) || 'Unknown'})`;
 
         return {
           id: record.id,
-          name: shortName,
-          entryTime: formatNow,
+          name: studentName,
+          entryTime: formatTime,
           status: "Present"
         };
       });
@@ -170,8 +170,8 @@ function App() {
             </button>
           </div>
 
-          <div className="mt-[1rem] overflow-x-auto overflow-y-auto rounded-none px-[0.15rem] flex-1">
-            <table className="w-full border-collapse min-w-0 table-fixed">
+          <div className="mt-[1rem] overflow-x-auto rounded-none px-[0.15rem] flex-1">
+            <table className="w-full border-collapse min-w-[800px]">
               <thead className="sticky top-0 bg-transparent z-10 before:content-[''] before:absolute before:inset-0 before:border-b-[1.6px] before:border-border before:pointer-events-none transition-colors duration-200">
                 <tr>
                   <th scope="col" className="w-[13%] pl-[2rem] text-left py-[0.48rem] px-[0.75rem] pb-[0.5rem] font-['Bebas_Neue',sans-serif] text-[clamp(1.35rem,2.05vw,2.2rem)] tracking-[0.02em] whitespace-nowrap">ID</th>
